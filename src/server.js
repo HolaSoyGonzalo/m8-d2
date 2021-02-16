@@ -1,47 +1,53 @@
-const express = require("express");
-const cors = require("cors");
-const { join } = require("path");
-const listEndpoints = require("express-list-endpoints");
-const mongoose = require("mongoose");
+const express = require('express');
+const cors = require('cors');
+const { join } = require('path')
+const listEndpoints = require('express-list-endpoints')
+const mongoose = require('mongoose')
 
-const usersRouter = require("./services/users");
+const usersRouter = require('./services/users')
 
 const {
-  notFoundHandler,
-  forbiddenHandler,
-  badRequestHandler,
-  genericErrorHandler,
-} = require("./errorHandlers");
+    notFoundHandler,
+    forbiddenHandler,
+    badRequestHandler,
+    genericErrorHandler
+} = require('./errorHandlers')
 
 const server = express();
 
 server.use(cors());
-const port = process.env.PORT || 9001;
+const port = process.env.PORT || 9001
 
-const staticFolderPath = join(__dirname, "../public");
-server.use(express.static(staticFolderPath));
-server.use(express.json());
+//for pics n shit
+const staticFolderPath = join(__dirname, "../public")
+server.use(express.static(staticFolderPath))
+server.use(express.json())
 
-server.use("/users", usersRouter);
+server.use("/users", usersRouter)
+// server.get("/test", (req, res, next) => {
+//     res.send("smthing")
+// })
 
-server.use(badRequestHandler);
-server.use(forbiddenHandler);
-server.use(notFoundHandler);
-server.use(genericErrorHandler);
+//errors n shit
 
-console.log(listEndpoints(server));
+server.use(badRequestHandler)
+server.use(forbiddenHandler)
+server.use(notFoundHandler)
+server.use(genericErrorHandler)
 
-mongoose.set("debug", true);
+console.log(listEndpoints(server))
+
+mongoose.set("debug", true)
 
 mongoose
-  .connect(process.env.MONGO_CONNECTION, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    useCreateIndex: true,
-  })
-  .then(
-    server.listen(port, () => {
-      console.log("Running on port", port);
+    .connect(process.env.MONGO_CONNECTION, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+        useCreateIndex: true,
     })
-  )
-  .catch((err) => console.log(err));
+    .then(
+        server.listen(port, () => {
+            console.log("Running on port", port)
+        })
+    )
+    .catch(err => console.log(err))
