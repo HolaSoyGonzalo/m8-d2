@@ -1,53 +1,47 @@
-const express = require('express');
-const cors = require('cors');
-const { join } = require('path')
-const listEndpoints = require('express-list-endpoints')
-const mongoose = require('mongoose')
+const express = require("express");
+const cors = require("cors");
+const { join } = require("path");
+const listEndpoints = require("express-list-endpoints");
+const mongoose = require("mongoose");
 
-const usersRouter = require('./services/users')
+const usersRouter = require("./services/users");
 
 const {
-    notFoundHandler,
-    forbiddenHandler,
-    badRequestHandler,
-    genericErrorHandler
-} = require('./errorHandlers')
+  notFoundHandler,
+  forbiddenHandler,
+  badRequestHandler,
+  genericErrorHandler,
+} = require("./errorHandlers");
 
 const server = express();
 
 server.use(cors());
-const port = process.env.PORT || 9001
+const port = process.env.PORT || 4242;
 
-//for pics n shit
-const staticFolderPath = join(__dirname, "../public")
-server.use(express.static(staticFolderPath))
-server.use(express.json())
+const staticFolderPath = join(__dirname, "../public");
+server.use(express.static(staticFolderPath));
+server.use(express.json());
 
-server.use("/users", usersRouter)
-// server.get("/test", (req, res, next) => {
-//     res.send("smthing")
-// })
+server.use("/users", usersRouter);
 
-//errors n shit
+server.use(badRequestHandler);
+server.use(forbiddenHandler);
+server.use(notFoundHandler);
+server.use(genericErrorHandler);
 
-server.use(badRequestHandler)
-server.use(forbiddenHandler)
-server.use(notFoundHandler)
-server.use(genericErrorHandler)
+console.log(listEndpoints(server));
 
-console.log(listEndpoints(server))
-
-mongoose.set("debug", true)
+mongoose.set("debug", true);
 
 mongoose
-    .connect(process.env.MONGO_CONNECTION, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-        useCreateIndex: true,
+  .connect(process.env.MONGO_CONNECTION, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useCreateIndex: true,
+  })
+  .then(
+    server.listen(port, () => {
+      console.log("Running on port", port);
     })
-    .then(
-        server.listen(port, () => {
-            console.log("Running on port", port)
-        })
-    )
-    .catch(err => console.log(err))
+  )
+  .catch((err) => console.log(err));
